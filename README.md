@@ -35,3 +35,50 @@ object SandboxApp:
     } @@ Security.authorized
   ).sandbox.toHttpApp
 ```
+
+### Update
+
+Many thanks to Nabil, I now have the solution.
+
+To read the path parameters, the middleware must be used before the handler.
+Then, the handler get access to the path parameter, as well as the Context and the Request.
+
+```scala 3
+object SandboxApp:
+  def apply(): HttpApp[Any] = Routes(
+    Method.GET / "hello" / string("username")
+      -> handler { (username: String, _: Request) =>
+        Response.text(s"Hello $username!")
+      },
+    Method.GET / "hola"
+      -> Security.authorized
+      -> handler { (user: User, _: Request) =>
+        Response.text(s"Sorry, ${user.username}, English only!")
+      },
+    Method.GET / "hola" / string("username")
+      -> Security.authorized
+      -> handler { (username: String, user: User, _: Request) =>
+        Response.text(s"Hola $username from ${user.username}")
+      },
+  ).sandbox.toHttpApp
+```
+
+This is how the API can be used:
+
+No authorization:
+```shell
+➜  ~ curl http://localhost:8080/hello/Joe ; echo
+Hello Joe!
+```
+
+With authorization, no path parameter:
+```shell
+➜  ~ curl -u Joe:eoJ http://localhost:8080/hola ; echo
+Sorry, Joe, English only!
+```
+
+With authorization and path parameter:
+```shell
+➜  ~ curl -u Joe:eoJ http://localhost:8080/hola/Jim ; echo
+Hola Jim from Joe
+```

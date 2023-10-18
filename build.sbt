@@ -4,11 +4,13 @@ ThisBuild / scalaVersion := "3.3.1"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "zio-http-sandbox",
-    idePackagePrefix := Some("com.vdumitrescu")
+    name             := "zio-http-sandbox",
+    idePackagePrefix := Some("com.vdumitrescu"),
   )
 
 resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 libraryDependencies ++= Seq(
-  "dev.zio" %% "zio-http" % "3.0.0-RC2+114-e195aa43-SNAPSHOT"
+  "dev.zio"  %% "zio-http"     % "3.0.0-RC2+114-e195aa43-SNAPSHOT",
+  "org.slf4j" % "slf4j-api"    % "2.0.9",
+  "org.slf4j" % "slf4j-simple" % "2.0.9",
 )
